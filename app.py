@@ -393,7 +393,7 @@ with aba_upload:
     st.markdown(
         """
         Nesta aba você pode fazer upload de um arquivo **CSV** contendo dados históricos
-        agregados, como o `historical_daily_volume_reduzido.csv`, gerado a partir do SQLite.
+        agregados.
 
         A ideia é usar a coluna de **volume diário** como aproximação da carga de trabalho 
         (número de operações ou requisições associadas àquele dia).
@@ -574,6 +574,7 @@ with aba_upload:
                 )
     else:
         st.info("Envie um arquivo CSV para habilitar as análises desta aba.")
+
 
 
 
