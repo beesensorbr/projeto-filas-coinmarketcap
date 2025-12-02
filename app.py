@@ -79,7 +79,7 @@ st.markdown(
     .btc-banner-subtitle {
         font-size: 1.05rem;
         max-width: 780px;
-        color: #330099;
+        color: #330000;
     }
 
     .btc-badge {
@@ -581,6 +581,7 @@ with aba_upload:
                 )
     else:
         st.info("Envie um arquivo CSV para habilitar as análises desta aba.")
+
 
 
 
