@@ -39,17 +39,18 @@ st.markdown(
         box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
     }
 
-    .btc-banner::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background-image: url("https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=032");
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: 60%;
-        opacity: 0.18;           /* deixa bem opaco */
-        filter: grayscale(40%);
-    }
+   .btc-banner::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=032");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 78%;
+    opacity: 0.32;                  /* deixa mais visível */
+    filter: saturate(1.3) drop-shadow(0 0 22px rgba(255, 140, 0, 0.45));
+}
+
 
     .btc-banner-overlay {
         position: absolute;
@@ -574,6 +575,7 @@ with aba_upload:
                 )
     else:
         st.info("Envie um arquivo CSV para habilitar as análises desta aba.")
+
 
 
 
