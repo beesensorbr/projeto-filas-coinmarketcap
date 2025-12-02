@@ -3,22 +3,147 @@ import math
 import pandas as pd
 import streamlit as st
 
-# -----------------------------
+# ----------------------------------------
 # Configuração básica da página
-# -----------------------------
+# ----------------------------------------
 st.set_page_config(
     page_title="Desempenho CoinMarketCap - Teoria das Filas",
     layout="wide"
 )
 
-st.title("Análise de Desempenho com Teoria das Filas")
-st.caption("Exemplo aplicado ao CoinMarketCap usando dataset histórico (Kaggle).")
+# ----------------------------------------
+# CSS personalizado (cores + banner Bitcoin)
+# ----------------------------------------
+st.markdown(
+    """
+    <style>
+    /* Fundo geral com gradiente suave */
+    [data-testid="stAppViewContainer"] {
+        background: radial-gradient(circle at top left, #1b2838 0, #0b1117 40%, #05070a 100%);
+        color: #f5f5f5;
+    }
+
+    /* Remove fundo branco de alguns containers */
+    [data-testid="stHeader"] {
+        background: transparent;
+    }
+
+    /* Banner com imagem grande do Bitcoin */
+    .btc-banner {
+        position: relative;
+        width: 100%;
+        height: 260px;
+        border-radius: 18px;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+    }
+
+    .btc-banner::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: url("https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=032");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 60%;
+        opacity: 0.18;           /* deixa bem opaco */
+        filter: grayscale(40%);
+    }
+
+    .btc-banner-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, rgba(7,12,24,0.98), rgba(8,21,45,0.9), rgba(222, 146, 19, 0.55));
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 2.5rem 3rem;
+    }
+
+    .btc-banner-title {
+        font-size: 2.1rem;
+        font-weight: 800;
+        color: #f8f5ff;
+        text-shadow: 0 0 10px rgba(0,0,0,0.7);
+        margin-bottom: 0.3rem;
+    }
+
+    .btc-banner-subtitle {
+        font-size: 1.05rem;
+        max-width: 780px;
+        color: #e7ecff;
+    }
+
+    .btc-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 0.25rem 0.7rem;
+        border-radius: 999px;
+        background: rgba(251, 191, 36, 0.18);
+        color: #fde68a;
+        border: 1px solid rgba(251, 191, 36, 0.4);
+        margin-bottom: 0.8rem;
+    }
+
+    /* Abas */
+    button[data-baseweb="tab"] {
+        font-weight: 600 !important;
+    }
+
+    /* Cartões de métrica */
+    [data-testid="stMetric"] {
+        background: rgba(15,23,42,0.85);
+        padding: 0.75rem 0.75rem;
+        border-radius: 0.9rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+        border: 1px solid rgba(148,163,184,0.35);
+    }
+
+    /* Caixas de informação */
+    .block-container {
+        padding-top: 1.2rem;
+    }
+
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# ----------------------------------------
+# Banner customizado com imagem do Bitcoin
+# ----------------------------------------
+st.markdown(
+    """
+    <div class="btc-banner">
+      <div class="btc-banner-overlay">
+        <div class="btc-badge">
+          🔢 Filas & Criptomoedas
+        </div>
+        <div class="btc-banner-title">
+          Avaliação de Desempenho do CoinMarketCap
+        </div>
+        <div class="btc-banner-subtitle">
+          Protótipo interativo em Streamlit para análise de desempenho de um sistema inspirado no CoinMarketCap, 
+          utilizando Teoria das Filas (modelos M/M/1 e M/M/c) e dataset histórico de criptomoedas.
+        </div>
+      </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+st.caption("Projeto de Modelagem: Teoria das Filas aplicada a um sistema web de alta demanda.")
 
 
-# -----------------------------
-# Função para calcular métricas M/M/1
-# -----------------------------
-def mm1_metrics(lmbda, mu):
+# ----------------------------------------
+# Funções de métricas de fila
+# ----------------------------------------
+def mm1_metrics(lmbda: float, mu: float):
     """
     Calcula métricas do modelo M/M/1.
     λ (lmbda) e μ (mu) em requisições por segundo.
@@ -32,10 +157,10 @@ def mm1_metrics(lmbda, mu):
         return None
 
     rho = lmbda / mu  # Utilização
-    L = rho / (1 - rho)  # Número médio de clientes no sistema
-    Lq = rho ** 2 / (1 - rho)  # Número médio na fila
-    W = 1 / (mu - lmbda)  # Tempo médio no sistema (segundos)
-    Wq = lmbda / (mu * (mu - lmbda))  # Tempo médio na fila (segundos)
+    L = rho / (1 - rho)  # Número médio no sistema
+    Lq = (rho ** 2) / (1 - rho)  # Número médio na fila
+    W = 1 / (mu - lmbda)  # Tempo médio no sistema (s)
+    Wq = lmbda / (mu * (mu - lmbda))  # Tempo médio na fila (s)
 
     return {
         "rho": rho,
@@ -46,88 +171,140 @@ def mm1_metrics(lmbda, mu):
     }
 
 
-# -----------------------------
+def mmc_metrics(lmbda: float, mu: float, c: int):
+    """
+    Calcula métricas do modelo M/M/c (c servidores idênticos).
+    Fórmulas clássicas com Erlang C.
+    λ e μ em req/s.
+
+    Retorna dict ou None se sistema for instável ou parâmetros inválidos.
+    """
+    if lmbda <= 0 or mu <= 0 or c <= 0:
+        return None
+
+    # taxa de utilização global
+    rho = lmbda / (c * mu)
+    if rho >= 1:
+        # sistema instável
+        return None
+
+    a = lmbda / mu  # tráfego oferecido
+
+    # cálculo de P0 (probabilidade de zero clientes no sistema)
+    sum_terms = 0.0
+    for n in range(c):
+        sum_terms += (a ** n) / math.factorial(n)
+
+    last_term = (a ** c) / (math.factorial(c) * (1 - rho))
+    P0 = 1.0 / (sum_terms + last_term)
+
+    # Lq (clientes médios em fila) - fórmula de Erlang C
+    Lq = (
+        P0
+        * (a ** c)
+        * rho
+        / (math.factorial(c) * ((1 - rho) ** 2))
+    )
+
+    L = Lq + a            # clientes médios no sistema
+    Wq = Lq / lmbda       # tempo médio em fila
+    W = Wq + 1 / mu       # tempo médio no sistema
+
+    return {
+        "rho": rho,
+        "L": L,
+        "Lq": Lq,
+        "W": W,
+        "Wq": Wq,
+        "P0": P0,
+    }
+
+
+# ----------------------------------------
 # Abas do site
-# -----------------------------
+# ----------------------------------------
 aba_instrucoes, aba_medicoes, aba_upload = st.tabs(
-    ["📘 Instruções", "📏 Medições Teóricas", "📂 Upload do Dataset"]
+    ["📘 Instruções", "📏 Medições Teóricas (M/M/1 e M/M/c)", "📂 Upload do Dataset"]
 )
 
 
-# -----------------------------
+# ----------------------------------------
 # ABA 1 – INSTRUÇÕES
-# -----------------------------
+# ----------------------------------------
 with aba_instrucoes:
     st.header("Como usar este site")
 
     st.markdown(
         """
-        Este site foi desenvolvido para um projeto de avaliação de desempenho de sistemas,
-        aplicando **Teoria das Filas (modelo M/M/1)** a um contexto inspirado no site
-        **CoinMarketCap**, utilizando um dataset público do Kaggle.
+        Este site foi desenvolvido como parte de um projeto de **modelagem e avaliação de desempenho**,
+        aplicando **Teoria das Filas** a um cenário inspirado no site **CoinMarketCap**.
 
-        ### Estrutura das abas
+        Ele está dividido em três partes principais:
 
-        **1. Instruções (esta aba)**  
-        - Explica o objetivo do projeto.  
-        - Mostra como usar as demais abas.  
+        ### 1. Instruções
+        - Apresenta o objetivo geral do projeto.
+        - Explica a lógica do uso de filas M/M/1 e M/M/c.
 
-        **2. Medições Teóricas**  
-        - Você informa os valores de:
-            - Taxa de chegada (λ) em requisições por segundo (req/s);
-            - Taxa de serviço (μ) em requisições por segundo (req/s).  
+        ### 2. Medições Teóricas
+        - Permite experimentar com os modelos:
+          - **M/M/1** (um servidor lógico)
+          - **M/M/c** (vários servidores em paralelo)
+        - Você escolhe:
+          - A taxa de chegada **λ** (req/s);
+          - A taxa de serviço **μ** (req/s);
+          - Opcionalmente, o número de servidores **c** (para M/M/c).
         - O sistema calcula automaticamente:
-            - Utilização do servidor (ρ);
-            - Número médio de requisições no sistema (L);
-            - Número médio na fila (Lq);
-            - Tempo médio no sistema (W);
-            - Tempo médio de espera na fila (Wq).  
+          - Utilização **ρ**
+          - Número médio de requisições no sistema **L**
+          - Número médio na fila **Lq**
+          - Tempo médio no sistema **W**
+          - Tempo médio na fila **Wq**
 
-        **3. Upload do Dataset**  
-        - Você faz upload de um arquivo **CSV** (por exemplo, o dataset histórico do CoinMarketCap do Kaggle);  
-        - Escolhe:
-            - A coluna de data;
-            - A coluna de volume (por exemplo, `Volume` ou similar);  
-        - O sistema:
-            - Calcula uma **taxa média de chegadas λ** aproximada, considerando o volume diário;
-            - Permite informar um valor de μ (capacidade do servidor);
-            - Apresenta as métricas M/M/1 para:
-                - Um dia médio;
-                - O dia de maior volume (pico).  
+        ### 3. Upload do Dataset
+        - Permite enviar um arquivo **CSV** (por exemplo, o `historical_daily_volume_reduzido.csv` que você gerou no R);
+        - A partir da coluna de volume diário, o sistema:
+          - Estima um **λ médio** e um **λ de pico**;
+          - Calcula as métricas de desempenho usando M/M/1 ou M/M/c.
 
-        ### Observação importante
-
-        Este site é um **protótipo acadêmico**:
-        - Ele não acessa o CoinMarketCap em tempo real;
-        - Usa o dataset histórico como aproximação para a carga (volume de operações/consultas);
-        - Serve para ilustrar como aplicar **Teoria das Filas** na análise de desempenho de sistemas web.
+        ---
+        **Observação:**  
+        Este é um protótipo acadêmico, focado em **conceitos de modelagem e análise de desempenho**, 
+        e não em representar com precisão a infraestrutura real do CoinMarketCap.
         """
     )
 
     st.info(
-        "Dica: você pode adaptar os textos desta aba para descrever exatamente o escopo do seu projeto "
-        "(como se fosse a introdução/metodologia da sua monografia ou relatório)."
+        "Você pode aproveitar os textos desta aba como base para as seções de Introdução e Metodologia do seu relatório."
     )
 
 
-# -----------------------------
-# ABA 2 – MEDIÇÕES TEÓRICAS
-# -----------------------------
+# ----------------------------------------
+# ABA 2 – MEDIÇÕES TEÓRICAS (M/M/1 e M/M/c)
+# ----------------------------------------
 with aba_medicoes:
-    st.header("Medições Teóricas (modelo M/M/1)")
+    st.header("Medições Teóricas – Modelos M/M/1 e M/M/c")
 
     st.markdown(
         """
-        Nesta aba você pode fazer **experimentos teóricos** com o modelo M/M/1:
+        Selecione o **modelo de fila** que deseja analisar e informe os parâmetros:
 
-        - **λ (lambda)**: taxa de chegada de requisições (req/s);  
-        - **μ (mi)**: taxa de serviço do servidor (req/s).  
+        - **λ (lambda)**: taxa de chegada de requisições (req/s);
+        - **μ (mi)**: taxa de serviço do servidor (req/s);
+        - **c**: número de servidores (somente para M/M/c).
 
-        Lembre-se: para o sistema ser estável, é necessário que **λ < μ** (ou seja, ρ = λ/μ < 1).
+        Lembre-se:
+        - Para **M/M/1**, é necessário que **λ < μ**;
+        - Para **M/M/c**, é necessário que **λ < c·μ** (ou seja, ρ < 1).
         """
     )
 
-    col1, col2 = st.columns(2)
+    model_type = st.radio(
+        "Escolha o modelo de fila:",
+        ["M/M/1", "M/M/c"],
+        horizontal=True,
+    )
+
+    col1, col2, col3 = st.columns(3)
 
     with col1:
         lmbda = st.number_input(
@@ -140,20 +317,35 @@ with aba_medicoes:
 
     with col2:
         mu = st.number_input(
-            "Taxa de serviço μ (req/s)",
+            "Taxa de serviço μ (req/s) por servidor",
             min_value=0.0,
             value=50.0,
             step=1.0,
-            help="Quantidade média de requisições que o servidor consegue atender por segundo."
+            help="Quantidade média de requisições que cada servidor consegue atender por segundo."
         )
 
-    if st.button("Calcular métricas M/M/1", type="primary"):
-        resultados = mm1_metrics(lmbda, mu)
+    if model_type == "M/M/c":
+        with col3:
+            c = st.number_input(
+                "Número de servidores c",
+                min_value=1,
+                value=2,
+                step=1,
+                help="Quantidade de servidores (ou instâncias) atendendo em paralelo."
+            )
+    else:
+        c = 1  # apenas para manter referência, não usado em M/M/1
+
+    if st.button("Calcular métricas do modelo selecionado", type="primary"):
+        if model_type == "M/M/1":
+            resultados = mm1_metrics(lmbda, mu)
+        else:
+            resultados = mmc_metrics(lmbda, mu, c)
 
         if resultados is None:
             st.error(
                 "Não foi possível calcular as métricas. "
-                "Verifique se λ > 0, μ > 0 e λ < μ (o sistema precisa ser estável)."
+                "Verifique se λ > 0, μ > 0 e que o sistema é estável (λ < μ para M/M/1 ou λ < c·μ para M/M/c)."
             )
         else:
             rho = resultados["rho"]
@@ -164,55 +356,54 @@ with aba_medicoes:
 
             st.subheader("Resultados")
 
-            col_a, col_b, col_c = st.columns(3)
+            col_a, col_b, col_c2 = st.columns(3)
             with col_a:
                 st.metric("Utilização ρ", f"{rho:.3f}")
                 st.metric("Nº médio no sistema L", f"{L:.3f}")
             with col_b:
                 st.metric("Nº médio na fila Lq", f"{Lq:.3f}")
-            with col_c:
+            with col_c2:
                 st.metric("Tempo médio no sistema W (s)", f"{W:.3f}")
                 st.metric("Tempo médio na fila Wq (s)", f"{Wq:.3f}")
+
+            if model_type == "M/M/c":
+                st.markdown(
+                    f"**Modelo M/M/c com c = {c} servidores.** "
+                    "A utilização ρ representa a fração média de ocupação global do sistema."
+                )
+            else:
+                st.markdown("**Modelo M/M/1** (um servidor lógico atendendo todas as requisições).")
 
             st.markdown(
                 """
                 **Interpretação rápida:**
-                - Quanto mais próximo de 1 for ρ, maior o risco de saturação do servidor;
-                - L e Lq indicam a quantidade média de requisições “presas” no sistema e na fila;
-                - W e Wq indicam quanto tempo, em média, uma requisição gasta esperando e sendo atendida.
+                - Quanto mais próximo de 1 for ρ, maior o risco de saturação do sistema;
+                - L e Lq indicam o número médio de requisições em atendimento + fila;
+                - W e Wq indicam, em segundos, o tempo médio gasto no sistema e na fila.
                 """
             )
 
 
-# -----------------------------
+# ----------------------------------------
 # ABA 3 – UPLOAD DO DATASET
-# -----------------------------
+# ----------------------------------------
 with aba_upload:
     st.header("Upload do Dataset (CoinMarketCap / outro CSV)")
 
     st.markdown(
         """
-        Nesta aba você pode fazer upload de um arquivo **CSV** contendo dados históricos,
-        como o dataset do CoinMarketCap (preço, volume, market cap, etc.).
+        Nesta aba você pode fazer upload de um arquivo **CSV** contendo dados históricos
+        agregados, como o `historical_daily_volume_reduzido.csv`, gerado a partir do SQLite.
 
-        A ideia é **usar o volume diário como proxy da carga** no sistema
-        (por exemplo, número de negociações, consultas ou acessos referentes àquele dia).
-
-        O fluxo geral é:
-        1. Fazer upload do CSV;  
-        2. Escolher a coluna de data e a coluna de **volume**;  
-        3. O sistema calcula uma taxa de chegada **λ (req/s)** aproximada;  
-        4. Você informa um valor de **μ (req/s)**;  
-        5. São calculadas as métricas M/M/1 para:
-            - Um dia médio;
-            - O dia de **maior volume** (pior caso / pico).
+        A ideia é usar a coluna de **volume diário** como aproximação da carga de trabalho 
+        (número de operações ou requisições associadas àquele dia).
         """
     )
 
     arquivo = st.file_uploader(
-        "Envie o arquivo CSV",
+        "Envie o arquivo CSV com volume diário agregado",
         type=["csv"],
-        help="Use, por exemplo, o dataset histórico do CoinMarketCap baixado do Kaggle."
+        help="Use, por exemplo, o arquivo historical_daily_volume_reduzido.csv com colunas 'date' e 'volume_24h_total'."
     )
 
     if arquivo is not None:
@@ -222,8 +413,7 @@ with aba_upload:
             st.error(f"Erro ao ler o CSV: {e}")
             st.stop()
 
-        st.success("CSV carregado com sucesso!")
-        st.write("Visualização inicial dos dados:")
+        st.success("CSV carregado com sucesso! Pré-visualização:")
         st.dataframe(df.head())
 
         colunas = df.columns.tolist()
@@ -233,62 +423,56 @@ with aba_upload:
         col_data = st.selectbox(
             "Coluna de data (opcional, mas recomendado)",
             options=["<nenhuma>"] + colunas,
-            index=0
+            index=1 if "date" in colunas else 0,
         )
 
         col_volume = st.selectbox(
-            "Coluna de volume (quantidade por dia/linha)",
-            options=colunas
+            "Coluna de volume (por dia)",
+            options=colunas,
+            index=colunas.index("volume_24h_total") if "volume_24h_total" in colunas else 0
         )
 
-        st.info(
-            "Assumindo que **cada linha** representa um período (por exemplo, um dia) e que a coluna de volume "
-            "representa o total de operações/consultas daquele período."
-        )
-
-        # Converter data, se selecionada
         if col_data != "<nenhuma>":
             try:
                 df[col_data] = pd.to_datetime(df[col_data])
             except Exception:
-                st.warning("Não foi possível converter a coluna de data automaticamente. "
-                           "Verifique o formato no CSV.")
+                st.warning(
+                    "Não foi possível converter a coluna de data automaticamente. "
+                    "Verifique o formato da coluna selecionada."
+                )
 
-        # Remover linhas com volume nulo/Nan
+        # Limpeza básica de volume
         df_limp = df.dropna(subset=[col_volume]).copy()
-
-        # Garantir que o volume é numérico
         df_limp[col_volume] = pd.to_numeric(df_limp[col_volume], errors="coerce")
         df_limp = df_limp.dropna(subset=[col_volume])
 
-        st.subheader("Resumo do volume")
+        st.subheader("Resumo do volume diário")
 
         volume_medio = df_limp[col_volume].mean()
         volume_max = df_limp[col_volume].max()
 
-        st.write(f"**Volume médio por linha** (ex.: por dia): `{volume_medio:.2f}`")
-        st.write(f"**Maior volume em uma linha** (pico): `{volume_max:.2f}`")
+        st.write(f"**Volume médio por linha** (ex.: por dia): `{volume_medio:,.2f}`")
+        st.write(f"**Maior volume em uma linha** (pico): `{volume_max:,.2f}`")
 
         st.markdown("---")
 
-        st.subheader("Parâmetros da fila")
+        st.subheader("Estimativa de λ (taxa de chegada)")
 
         st.markdown(
             """
-            Vamos assumir que cada linha representa **um dia** de observação.
+            Assumindo que cada linha representa **um dia**, aproximamos:
 
-            - A taxa de chegada média λ será aproximada como:
-
+            - Taxa de chegada média:
               \\[
                   \\lambda_{médio} = \\frac{\\text{volume médio por dia}}{24 \\times 3600}
               \\]
 
-            - E a taxa de chegada no pico será:
-
+            - Taxa de chegada no pico:
               \\[
                   \\lambda_{pico} = \\frac{\\text{maior volume por dia}}{24 \\times 3600}
               \\]
-            """
+            """,
+            unsafe_allow_html=True,
         )
 
         segundos_dia = 24 * 3600
@@ -301,22 +485,52 @@ with aba_upload:
         with col_l2:
             st.write(f"**λ pico (req/s)** ≈ `{lambda_pico:.6f}`")
 
-        mu_dataset = st.number_input(
-            "Informe a taxa de serviço μ (req/s) do servidor hipotético",
-            min_value=0.0,
-            value=float(max(lambda_pico * 2, 1.0)),
-            step=1.0,
-            help="Capacidade média de atendimento do servidor em requisições por segundo."
+        st.markdown("---")
+
+        st.subheader("Parâmetros da fila para o dataset")
+
+        model_type_ds = st.radio(
+            "Modelo para análise com base no dataset:",
+            ["M/M/1", "M/M/c"],
+            horizontal=True,
         )
 
+        col_par1, col_par2 = st.columns(2)
+
+        with col_par1:
+            mu_dataset = st.number_input(
+                "Taxa de serviço μ (req/s) por servidor",
+                min_value=0.0,
+                value=float(max(lambda_pico * 2, 1.0)),
+                step=1.0,
+                help="Capacidade média de atendimento de cada servidor (req/s)."
+            )
+
+        if model_type_ds == "M/M/c":
+            with col_par2:
+                c_dataset = st.number_input(
+                    "Número de servidores c",
+                    min_value=1,
+                    value=2,
+                    step=1,
+                    help="Quantidade de servidores (ou instâncias) atendendo em paralelo."
+                )
+        else:
+            c_dataset = 1
+
         if st.button("Calcular métricas com base no dataset", type="primary"):
-            res_medio = mm1_metrics(lambda_medio, mu_dataset)
-            res_pico = mm1_metrics(lambda_pico, mu_dataset)
+            if model_type_ds == "M/M/1":
+                res_medio = mm1_metrics(lambda_medio, mu_dataset)
+                res_pico = mm1_metrics(lambda_pico, mu_dataset)
+            else:
+                res_medio = mmc_metrics(lambda_medio, mu_dataset, c_dataset)
+                res_pico = mmc_metrics(lambda_pico, mu_dataset, c_dataset)
 
             if res_medio is None or res_pico is None:
                 st.error(
                     "Não foi possível calcular as métricas. "
-                    "Verifique se μ é maior do que λ médio e λ pico (o sistema precisa ser estável)."
+                    "Verifique se μ é maior do que λ médio e λ pico (para M/M/1) "
+                    "ou se λ < c·μ (para M/M/c), garantindo estabilidade do sistema."
                 )
             else:
                 st.subheader("Resultados - Dia Médio")
@@ -341,14 +555,21 @@ with aba_upload:
                     st.metric("W pico (s)", f"{res_pico['W']:.4f}")
                     st.metric("Wq pico (s)", f"{res_pico['Wq']:.4f}")
 
+                if model_type_ds == "M/M/c":
+                    st.markdown(
+                        f"**Modelo M/M/c com c = {c_dataset} servidores aplicado ao dia médio e ao dia de pico.**"
+                    )
+                else:
+                    st.markdown("**Modelo M/M/1 aplicado ao dia médio e ao dia de pico.**")
+
                 st.markdown(
                     """
                     **Interpretação:**
 
-                    - No **dia médio**, ρ indica o quanto o servidor está ocupado em situação típica;
-                    - No **dia de pico**, ρ se aproxima de 1 se o servidor estiver perto de saturar;
-                    - W e Wq permitem discutir o impacto da carga no **tempo de resposta** percebido pelos usuários;
-                    - Você pode variar μ para simular melhorias na infraestrutura (mais recursos, otimização, etc.).
+                    - No **dia médio**, ρ mostra o quanto o sistema está ocupado em situação típica;
+                    - No **dia de pico**, ρ se aproxima mais de 1, indicando maior risco de saturação;
+                    - W e Wq podem ser usados para discutir impacto no tempo de resposta percebido pelos usuários;
+                    - Ao variar μ e (quando aplicável) c, você consegue simular melhorias na infraestrutura.
                     """
                 )
     else:
