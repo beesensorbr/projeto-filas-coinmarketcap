@@ -20,7 +20,7 @@ st.markdown(
     /* Fundo geral com gradiente suave */
     [data-testid="stAppViewContainer"] {
         background: radial-gradient(circle at top left, #1b2838 0, #cc9999 40%, #cccccc 100%);
-        color: #66ff66;
+        color: #66ff33;
     }
 
     /* Remove fundo branco de alguns containers */
@@ -581,6 +581,7 @@ with aba_upload:
                 )
     else:
         st.info("Envie um arquivo CSV para habilitar as análises desta aba.")
+
 
 
 
