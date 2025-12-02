@@ -393,27 +393,6 @@ with aba_medicoes:
                 """
             )
 
-# ----------------------------------------
-# GRÁFICOS – Medições Teóricas
-# ----------------------------------------
-st.subheader("Gráficos das métricas")
-
-metricas = {
-    "ρ (utilização)": rho,
-    "L (no sistema)": L,
-    "Lq (na fila)": Lq,
-    "W (tempo no sistema)": W,
-    "Wq (tempo na fila)": Wq,
-}
-
-fig, ax = plt.subplots(figsize=(8, 4))
-ax.bar(metricas.keys(), metricas.values(), color=["#ff9900", "#ffaa22", "#ffcc66", "#ffeeaa", "#ffdd77"])
-ax.set_ylabel("Valor")
-ax.set_title("Métricas do modelo " + model_type)
-plt.xticks(rotation=45)
-st.pyplot(fig)
-
-
 
 # ----------------------------------------
 # ABA 3 – UPLOAD DO DATASET
@@ -605,6 +584,7 @@ with aba_upload:
                 )
     else:
         st.info("Envie um arquivo CSV para habilitar as análises desta aba.")
+
 
 
 
