@@ -483,6 +483,18 @@ with aba_upload:
         st.write(f"**Volume médio por linha** (ex.: por dia): `{volume_medio:,.2f}`")
         st.write(f"**Maior volume em uma linha** (pico): `{volume_max:,.2f}`")
 
+
+        # Gráfico simples do volume ao longo do tempo (se houver data)
+        if col_data != "<nenhuma>":
+            st.subheader("Evolução do volume diário")
+            fig_vol, ax_vol = plt.subplots(figsize=(9, 3))
+            ax_vol.plot(df_limp[col_data], df_limp[col_volume])
+            ax_vol.set_xlabel("Data")
+            ax_vol.set_ylabel("Volume diário")
+            ax_vol.set_title("Volume diário ao longo do tempo")
+            plt.xticks(rotation=30)
+            st.pyplot(fig_vol)    
+
         st.markdown("---")
 
         st.subheader("Estimativa de λ (taxa de chegada)")
@@ -591,6 +603,66 @@ with aba_upload:
                 else:
                     st.markdown("**Modelo M/M/1 aplicado ao dia médio e ao dia de pico.**")
 
+
+
+
+
+
+
+  # --------- GRÁFICO COMPARATIVO (Médio x Pico) ----------
+                st.subheader("Gráfico comparativo – Dia Médio x Dia de Pico")
+
+                metricas_medio = {
+                    "ρ": res_medio["rho"],
+                    "L": res_medio["L"],
+                    "Lq": res_medio["Lq"],
+                    "W": res_medio["W"],
+                    "Wq": res_medio["Wq"],
+                }
+
+                metricas_pico = {
+                    "ρ": res_pico["rho"],
+                    "L": res_pico["L"],
+                    "Lq": res_pico["Lq"],
+                    "W": res_pico["W"],
+                    "Wq": res_pico["Wq"],
+                }
+
+                fig2, ax2 = plt.subplots(figsize=(9, 4))
+                indices = range(len(metricas_medio))
+                larg = 0.35
+
+                ax2.bar(
+                    [i - larg/2 for i in indices],
+                    list(metricas_medio.values()),
+                    width=larg,
+                    label="Dia Médio",
+                )
+                ax2.bar(
+                    [i + larg/2 for i in indices],
+                    list(metricas_pico.values()),
+                    width=larg,
+                    label="Dia de Pico",
+                )
+
+                ax2.set_xticks(list(indices))
+                ax2.set_xticklabels(list(metricas_medio.keys()))
+                ax2.set_ylabel("Valor")
+                ax2.set_title("Métricas – comparação Dia Médio x Dia de Pico")
+                ax2.legend()
+
+                st.pyplot(fig2)
+
+                
+
+
+                
+
+
+
+
+                
+
                 st.markdown(
                     """
                     **Interpretação:**
@@ -603,6 +675,7 @@ with aba_upload:
                 )
     else:
         st.info("Envie um arquivo CSV para habilitar as análises desta aba.")
+
 
 
 
