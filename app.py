@@ -29,38 +29,44 @@ st.markdown(
     }
 
     /* Banner com imagem grande do Bitcoin */
-    .btc-banner {
-        position: relative;
-        width: 100%;
-        height: 260px;
-        border-radius: 18px;
-        overflow: hidden;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
-    }
+   .btc-banner {
+    position: relative;
+    width: 100%;
+    height: 260px;
+    border-radius: 18px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+}
 
-   .btc-banner::before {
+/* imagem do bitcoin */
+.btc-banner::before {
     content: "";
     position: absolute;
     inset: 0;
     background-image: url("https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=032");
     background-position: center;
     background-repeat: no-repeat;
-    background-size: 78%;
-    opacity: 0.32;                  /* deixa mais visível */
-    filter: saturate(1.3) drop-shadow(0 0 22px rgba(255, 140, 0, 0.45));
+    background-size: 85%;
+    opacity: 0.50;                           /* MAIS VISÍVEL */
+    filter: saturate(1.4) contrast(1.2);
 }
 
-
-    .btc-banner-overlay {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(120deg, rgba(7,12,24,0.98), rgba(8,21,45,0.9), rgba(222, 146, 19, 0.55));
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        padding: 2.5rem 3rem;
-    }
+/* camada colorida por cima para dar brilho e destacar a imagem */
+.btc-banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        120deg,
+        rgba(255, 165, 0, 0.70),     /* cor principal forte */
+        rgba(255, 200, 80, 0.50),
+        rgba(255, 255, 255, 0.35)
+    );
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2.5rem 3rem;
+}
 
     .btc-banner-title {
         font-size: 2.1rem;
@@ -575,6 +581,7 @@ with aba_upload:
                 )
     else:
         st.info("Envie um arquivo CSV para habilitar as análises desta aba.")
+
 
 
 
