@@ -261,7 +261,7 @@ with aba_instrucoes:
           - Tempo médio na fila **Wq**
 
         ### 3. Upload do Dataset
-        - Permite enviar um arquivo **CSV** (por exemplo, o `historical_daily_volume_reduzido.csv` que você gerou no R);
+        - Permite enviar um arquivo **CSV**;
         - A partir da coluna de volume diário, o sistema:
           - Estima um **λ médio** e um **λ de pico**;
           - Calcula as métricas de desempenho usando M/M/1 ou M/M/c.
@@ -274,7 +274,7 @@ with aba_instrucoes:
     )
 
     st.info(
-        "Você pode aproveitar os textos desta aba como base para as seções de Introdução e Metodologia do seu relatório."
+        "Desenvolvido por: Leandro Queiroz e Irismar Neris."
     )
 
 
@@ -574,6 +574,7 @@ with aba_upload:
                 )
     else:
         st.info("Envie um arquivo CSV para habilitar as análises desta aba.")
+
 
 
 
