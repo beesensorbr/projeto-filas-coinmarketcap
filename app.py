@@ -85,7 +85,7 @@ st.markdown(
         padding: 0.25rem 0.7rem;
         border-radius: 999px;
         background: rgba(251, 191, 36, 0.18);
-        color: #fde68a;
+        color: #ccccff;
         border: 1px solid rgba(251, 191, 36, 0.4);
         margin-bottom: 0.8rem;
     }
@@ -574,6 +574,7 @@ with aba_upload:
                 )
     else:
         st.info("Envie um arquivo CSV para habilitar as análises desta aba.")
+
 
 
 
