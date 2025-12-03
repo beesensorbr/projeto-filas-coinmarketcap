@@ -345,6 +345,7 @@ with aba_medicoes:
                 value=2,
                 step=1,
                 help="Quantidade de servidores (ou instâncias) atendendo em paralelo."
+                key="c_teorico",
             )
     else:
         c = 1  # apenas para manter referência, não usado em M/M/1
@@ -557,7 +558,8 @@ with aba_upload:
                     min_value=1,
                     value=2,
                     step=1,
-                    help="Quantidade de servidores (ou instâncias) atendendo em paralelo."
+                    help="Quantidade de servidores (ou instâncias) atendendo em paralelo para análise do dataset.",
+                    key="c_dataset",
                 )
         else:
             c_dataset = 1
@@ -662,6 +664,7 @@ with aba_upload:
                 )
     else:
         st.info("Envie um arquivo CSV para habilitar as análises desta aba.")
+
 
 
 
