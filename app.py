@@ -139,8 +139,7 @@ st.markdown(
           Avaliação de Desempenho do CoinMarketCap
         </div>
         <div class="btc-banner-subtitle">
-          Protótipo interativo em Streamlit para análise de desempenho de um sistema inspirado no CoinMarketCap, 
-          utilizando Teoria das Filas (modelos M/M/1 e M/M/c) e dataset histórico de criptomoedas.
+          Protótipo interativo em Streamlit para análise de desempenho de um sistema inspirado no CoinMarketCap,utilizando Teoria das Filas (modelos M/M/1 e M/M/c) e dataset histórico de criptomoedas.
         </div>
       </div>
     </div>
@@ -660,6 +659,7 @@ with aba_upload:
                 )
     else:
         st.info("Envie um arquivo CSV para habilitar as análises desta aba.")
+
 
 
 
