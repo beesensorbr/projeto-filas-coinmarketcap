@@ -32,14 +32,17 @@ st.markdown(
     }
 
     /* Banner com imagem grande do Bitcoin */
-   .btc-banner {
-    position: static;
-    width: 80%;
-    height: 260px;
-    border-radius: 20px;
-    overflow: hidden;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+   
+        .btc-banner {
+        position: relative;
+        width: 100%;
+        height: 260px;
+        border-radius: 18px;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+
+    
 }
 
 /* imagem do bitcoin */
@@ -659,6 +662,7 @@ with aba_upload:
                 )
     else:
         st.info("Envie um arquivo CSV para habilitar as análises desta aba.")
+
 
 
 
