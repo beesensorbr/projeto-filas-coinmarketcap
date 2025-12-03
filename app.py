@@ -73,7 +73,7 @@ st.markdown(
 
     .btc-banner-title {
         font-size: 2.1rem;
-        font-weight: 800;
+        font-weight: 900;
         color: #ccff33;
         text-shadow: 0 0 10px rgba(0,0,0,0.7);
         margin-bottom: 0.3rem;
@@ -659,6 +659,7 @@ with aba_upload:
                 )
     else:
         st.info("Envie um arquivo CSV para habilitar as análises desta aba.")
+
 
 
 
