@@ -50,7 +50,7 @@ st.markdown(
     background-image: url("https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=032");
     background-position: center;
     background-repeat: no-repeat;
-    background-size: 60%;
+    background-size: 40%;
     opacity: 0.50;                           /* MAIS VISÍVEL */
     filter: saturate(1.4) contrast(1.2);
 }
@@ -660,6 +660,7 @@ with aba_upload:
                 )
     else:
         st.info("Envie um arquivo CSV para habilitar as análises desta aba.")
+
 
 
 
