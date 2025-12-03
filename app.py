@@ -36,7 +36,7 @@ st.markdown(
     position: relative;
     width: 40%;
     height: 360px;
-    border-radius: 18px;
+    border-radius: 20px;
     overflow: hidden;
     margin-bottom: 1.5rem;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
@@ -660,6 +660,7 @@ with aba_upload:
                 )
     else:
         st.info("Envie um arquivo CSV para habilitar as análises desta aba.")
+
 
 
 
