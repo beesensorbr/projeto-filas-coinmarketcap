@@ -35,7 +35,7 @@ st.markdown(
    .btc-banner {
     position: static;
     width: 40%;
-    height: 160px;
+    height: 360px;
     border-radius: 18px;
     overflow: hidden;
     margin-bottom: 1.5rem;
@@ -660,6 +660,7 @@ with aba_upload:
                 )
     else:
         st.info("Envie um arquivo CSV para habilitar as análises desta aba.")
+
 
 
 
