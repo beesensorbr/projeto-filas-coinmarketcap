@@ -34,7 +34,7 @@ st.markdown(
     /* Banner com imagem grande do Bitcoin */
    
         .btc-banner {
-        position: relative;
+        position: static;
         width: 100%;
         height: 260px;
         border-radius: 18px;
@@ -664,6 +664,7 @@ with aba_upload:
                 )
     else:
         st.info("Envie um arquivo CSV para habilitar as análises desta aba.")
+
 
 
 
