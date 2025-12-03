@@ -107,14 +107,13 @@ st.markdown(
 
     /* Cartões de métrica */
    
-
 [data-testid="stMetric"] {
-    background: rgba(255, 200, 80, 0.45);  /* dourado claro */
+    background: rgba(255, 255, 255, 0.35);  /* CLARO */
     padding: 0.75rem 0.75rem;
     border-radius: 0.9rem;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-    border: 1px solid rgba(255,180,60,0.8);
-    color: #1b1b1b;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.20);
+    border: 1px solid rgba(255,255,255,0.5);
+    color: #000;  /* texto preto para máxima legibilidade */
 }
 
 
@@ -670,6 +669,7 @@ with aba_upload:
                 )
     else:
         st.info("Envie um arquivo CSV para habilitar as análises desta aba.")
+
 
 
 
