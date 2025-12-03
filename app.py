@@ -106,13 +106,15 @@ st.markdown(
     }
 
     /* Cartões de métrica */
-    [data-testid="stMetric"] {
-        background: rgba(15,23,42,0.85);
-        padding: 0.75rem 0.75rem;
-        border-radius: 0.9rem;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.35);
-        border: 1px solid rgba(148,163,184,0.35);
-    }
+   [data-testid="stMetric"] {
+    background: rgba(245, 245, 245, 0.80);
+    padding: 0.75rem 0.75rem;
+    border-radius: 0.9rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    border: 1px solid rgba(200,200,200,0.7);
+    color: #111;
+}
+
 
     /* Caixas de informação */
     .block-container {
@@ -603,12 +605,6 @@ with aba_upload:
                 else:
                     st.markdown("**Modelo M/M/1 aplicado ao dia médio e ao dia de pico.**")
 
-
-
-
-
-
-
   # --------- GRÁFICO COMPARATIVO (Médio x Pico) ----------
                 st.subheader("Gráfico comparativo – Dia Médio x Dia de Pico")
 
@@ -652,17 +648,7 @@ with aba_upload:
                 ax2.legend()
 
                 st.pyplot(fig2)
-
-                
-
-
-                
-
-
-
-
-                
-
+                   
                 st.markdown(
                     """
                     **Interpretação:**
@@ -675,6 +661,7 @@ with aba_upload:
                 )
     else:
         st.info("Envie um arquivo CSV para habilitar as análises desta aba.")
+
 
 
 
