@@ -245,7 +245,7 @@ aba_instrucoes, aba_medicoes, aba_upload = st.tabs(
 # ABA 1 – INSTRUÇÕES
 # ----------------------------------------
 with aba_instrucoes:
-    st.header("Como usar este site")
+    st.header("Como usar esta ferramenta")
 
     st.markdown(
         """
@@ -662,6 +662,7 @@ with aba_upload:
                 )
     else:
         st.info("Envie um arquivo CSV para habilitar as análises desta aba.")
+
 
 
 
