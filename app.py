@@ -344,7 +344,7 @@ with aba_medicoes:
                 min_value=1,
                 value=2,
                 step=1,
-                help="Quantidade de servidores (ou instâncias) atendendo em paralelo."
+                help="Quantidade de servidores (ou instâncias) atendendo em paralelo.",
                 key="c_teorico",
             )
     else:
@@ -664,6 +664,7 @@ with aba_upload:
                 )
     else:
         st.info("Envie um arquivo CSV para habilitar as análises desta aba.")
+
 
 
 
